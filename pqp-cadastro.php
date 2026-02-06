@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: plataforma-de-questoes-proone-cadastro
+ * Plugin Name: Plataforma de Questões ProOne - Register-Manager
  * Plugin URI: https://proone.io
- * Description: Cadastramento e Geração de Questões de Vestibular usando Google Gemini 1.5 Pro. Suporte a PDF, AVIF e Taxonomias Dinâmicas.
- * Version: 1.0.0
+ * Description: Cadastramento e Geração de Questões de Vestibular usando Google Gemini. Suporte a PDF, AVIF e Taxonomias Dinâmicas.
+ * Version: 1.1.0
  * Author: mayronmuniz.dev
  * Author URI: https://proone.io
  * Text Domain: gemini-vestibular-ai
