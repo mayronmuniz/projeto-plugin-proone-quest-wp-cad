@@ -13,9 +13,13 @@ class AjaxHandler {
         $this->gemini = new GeminiService();
         $this->image_service = new ImageService(); 
 
+        // Gerações e Histórico
         add_action('wp_ajax_gva_process_request', [$this, 'handle_request']);
         add_action('wp_ajax_gva_get_history', [$this, 'get_history']);
         add_action('wp_ajax_gva_get_new_subjects', [$this, 'get_new_subjects']);
+        
+        // Nova Action para Salvar Configurações via AJAX
+        add_action('wp_ajax_gva_save_settings', [$this, 'save_settings']);
         
         // Endpoints Dropdowns
         add_action('wp_ajax_gva_get_institutions', function() { $this->get_terms_simple('pqp_institutions'); });
@@ -24,6 +28,26 @@ class AjaxHandler {
         add_action('wp_ajax_gva_get_authors', function() { $this->get_terms_simple('pqp_authors'); });
         add_action('wp_ajax_gva_get_books', function() { $this->get_terms_simple('pqp_books', 'title'); });
         add_action('wp_ajax_gva_get_subjects', [$this, 'get_subjects_by_discipline']);
+    }
+
+    // --- Nova Função de Salvamento ---
+    public function save_settings() {
+        // Verifica o nonce para segurança (usa a constante definida no plugin principal)
+        check_ajax_referer(GVA_NONCE, 'nonce');
+
+        // Verifica permissões
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Você não tem permissão para realizar esta ação.');
+        }
+
+        // Sanitiza e Salva
+        if (isset($_POST['api_key'])) {
+            $api_key = sanitize_text_field($_POST['api_key']);
+            update_option('gva_gemini_api_key', $api_key);
+            wp_send_json_success('Chave API salva com sucesso!');
+        } else {
+            wp_send_json_error('Nenhuma chave fornecida.');
+        }
     }
 
     private function get_terms_simple($table_suffix, $col = 'name') {
