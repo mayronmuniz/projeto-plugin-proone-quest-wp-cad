@@ -10,12 +10,19 @@ $tipos_texto = $wpdb->get_col("SELECT name FROM {$wpdb->prefix}pqp_text_types OR
 $formas = $wpdb->get_col("SELECT name FROM {$wpdb->prefix}pqp_text_forms ORDER BY name");
 $tipologias = $wpdb->get_col("SELECT name FROM {$wpdb->prefix}pqp_text_typologies ORDER BY name");
 $generos = $wpdb->get_col("SELECT name FROM {$wpdb->prefix}pqp_text_genres ORDER BY name");
-$subgeneros = $wpdb->get_col("SELECT name FROM {$wpdb->prefix}pqp_text_subgenres ORDER BY name"); // Novo
+$subgeneros = $wpdb->get_col("SELECT name FROM {$wpdb->prefix}pqp_text_subgenres ORDER BY name");
 $periodos = $wpdb->get_col("SELECT name FROM {$wpdb->prefix}pqp_literary_periods ORDER BY id");
 $nacionalidades = $wpdb->get_col("SELECT name FROM {$wpdb->prefix}pqp_nationalities ORDER BY name");
 
-// Modelos Gemini Atualizados
+// Modelos Gemini Atualizados (Solicitação 02 - Cadastrar)
 $gemini_models = [
+    'gemini-2.0-pro-exp-02-05' => 'Gemini 2.0 Pro (Exp)',
+    'gemini-2.0-flash-thinking-exp' => 'Gemini 2.0 Flash Thinking',
+    'gemini-2.0-flash' => 'Gemini 2.0 Flash',
+    'gemini-2.0-flash-lite' => 'Gemini 2.0 Flash-Lite',
+    'gemini-1.5-pro' => 'Gemini 1.5 Pro',
+    'gemini-1.5-flash' => 'Gemini 1.5 Flash',
+    'gemini-1.5-flash-8b' => 'Gemini 1.5 Flash-8B',
     'gemini-3-pro-preview' => 'Gemini 3 Pro Preview',
     'gemini-3-flash-preview' => 'Gemini 3 Flash Preview',
     'gemini-2.5-pro' => 'Gemini 2.5 Pro',
@@ -29,8 +36,7 @@ $gemini_models = [
     
     <div class="gva-tabs">
         <button class="gva-tab active" data-target="#cadastrar">Cadastrar Questão</button>
-        <button class="gva-tab" data-target="#gerar">Gerar Questão</button>
-        <button class="gva-tab" data-target="#novos-assuntos">Novos Assuntos</button>
+        <button class="gva-tab" data-target="#gerar">Gerar</button> <button class="gva-tab" data-target="#novos-assuntos">Novos Assuntos</button>
         <button class="gva-tab" data-target="#historico">Histórico</button>
         <button class="gva-tab" data-target="#config">Configurações</button>
     </div>
@@ -56,7 +62,7 @@ $gemini_models = [
                     <div class="gva-field">
                         <label>Instituição</label>
                         <div class="pqp-creatable-select">
-                            <input type="hidden" name="instituicao" required>
+                            <input type="hidden" name="instituicao" id="cad_instituicao" required>
                             <button type="button" class="pqp-creatable-select-btn" data-target="cad_inst_dropdown">Digite ou selecione</button>
                             <div id="cad_inst_dropdown" class="pqp-creatable-select-dropdown">
                                 <input type="text" class="pqp-creatable-select-search" placeholder="Pesquisar ou adicionar...">
@@ -81,7 +87,7 @@ $gemini_models = [
                         <label>Versão</label>
                         <div class="pqp-creatable-select">
                             <input type="hidden" name="versao" required>
-                            <button type="button" class="pqp-creatable-select-btn" data-target="cad_versao_dropdown">Digite ou selecione</button>
+                            <button type="button" class="pqp-creatable-select-btn" id="cad_versao_btn" data-target="cad_versao_dropdown">Selecione a Instituição primeiro</button>
                             <div id="cad_versao_dropdown" class="pqp-creatable-select-dropdown">
                                 <input type="text" class="pqp-creatable-select-search" placeholder="Pesquisar ou adicionar...">
                                 <div class="pqp-creatable-select-options"></div>
@@ -99,17 +105,17 @@ $gemini_models = [
                             </div>
                         </div>
                     </div>
-                    </div>
+                </div>
 
                 <div class="gva-upload-wrapper">
                     <label style="font-weight:bold; display:block; margin-bottom:10px;">Anexar Prova (PDF)</label>
                     <div style="display:flex; align-items: center; gap: 15px;">
-                        <button type="button" class="button button-secondary" id="upload_pdf_btn">
-                            <span class="dashicons dashicons-paperclip"></span> Selecionar PDF
-                        </button>
                         <span id="pdf_filename" style="color: #666; font-style: italic;">Nenhum arquivo selecionado</span>
                         <input type="hidden" name="pdf_url" id="pdf_url">
                     </div>
+                    <button type="button" class="button button-secondary" id="upload_pdf_btn" style="margin-top: 10px;">
+                        <span class="dashicons dashicons-paperclip"></span> Selecionar PDF
+                    </button>
                 </div>
 
                 <div class="gva-field full-width" style="margin-top:20px;">
@@ -118,7 +124,7 @@ $gemini_models = [
                 </div>
 
                 <div class="gva-actions">
-                    <div class="gva-field" style="width: 250px;">
+                    <div class="gva-field" style="width: 250px; margin-right: 20px;">
                         <label>Modelo IA:</label>
                         <select name="ai_model">
                             <?php foreach($gemini_models as $key => $val): ?>
@@ -133,8 +139,7 @@ $gemini_models = [
         </div>
 
         <div id="gerar" class="gva-section">
-            <h2>Gerar Questão (Inédita/Similar)</h2>
-            <form id="form-gerar-similar">
+            <h2>Gerar Questão</h2> <form id="form-gerar-similar">
                 <div class="gva-grid">
                     <div class="gva-field">
                         <label>Disciplina</label>
@@ -158,9 +163,8 @@ $gemini_models = [
                         </div>
                     </div>
                     <div class="gva-field">
-                        <label>Instituição (Estilo)</label>
-                        <div class="pqp-creatable-select">
-                            <input type="hidden" name="instituicao">
+                        <label>Instituição</label> <div class="pqp-creatable-select">
+                            <input type="hidden" name="instituicao" id="ger_instituicao">
                             <button type="button" class="pqp-creatable-select-btn" data-target="ger_inst_dropdown">Digite ou selecione</button>
                             <div id="ger_inst_dropdown" class="pqp-creatable-select-dropdown">
                                 <input type="text" class="pqp-creatable-select-search" placeholder="Pesquisar...">
@@ -168,6 +172,12 @@ $gemini_models = [
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="gva-field">
+                        <label>Estilo da Questão</label>
+                        <input type="text" name="estilo_questao" class="regular-text" placeholder="Ex: Foco em interpretação, interdisciplinar..." style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px;">
+                    </div>
+
                     <div class="gva-field">
                         <label>Nível de Dificuldade</label>
                         <div class="pqp-singleselect">
@@ -179,8 +189,7 @@ $gemini_models = [
                         </div>
                     </div>
                      <div class="gva-field">
-                        <label>Ano (Referência)</label>
-                        <div class="pqp-creatable-select">
+                        <label>Ano</label> <div class="pqp-creatable-select">
                             <input type="hidden" name="ano" required>
                             <button type="button" class="pqp-creatable-select-btn" data-target="ger_ano_dropdown">Digite ou selecione</button>
                             <div id="ger_ano_dropdown" class="pqp-creatable-select-dropdown">
@@ -193,7 +202,7 @@ $gemini_models = [
                         <label>Versão</label>
                         <div class="pqp-creatable-select">
                             <input type="hidden" name="versao">
-                            <button type="button" class="pqp-creatable-select-btn" data-target="ger_versao_dropdown">Digite ou selecione</button>
+                            <button type="button" class="pqp-creatable-select-btn" id="ger_versao_btn" data-target="ger_versao_dropdown">Selecione a Instituição</button>
                             <div id="ger_versao_dropdown" class="pqp-creatable-select-dropdown">
                                 <input type="text" class="pqp-creatable-select-search" placeholder="Pesquisar...">
                                 <div class="pqp-creatable-select-options"></div>
@@ -202,127 +211,131 @@ $gemini_models = [
                     </div>
                 </div>
 
-                <h3>Detalhes do Texto Base (Opcional - Para Geração)</h3>
-                <div class="gva-grid">
-                    <div class="gva-field">
-                        <label>Título do Texto</label>
-                        <input type="text" name="titulo_texto" class="regular-text" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px;">
-                    </div>
-                     <div class="gva-field">
-                        <label>Autor</label>
-                        <div class="pqp-creatable-select">
-                            <input type="hidden" name="autor">
-                            <button type="button" class="pqp-creatable-select-btn" data-target="ger_autor_dropdown">Digite ou selecione</button>
-                            <div id="ger_autor_dropdown" class="pqp-creatable-select-dropdown">
-                                <input type="text" class="pqp-creatable-select-search" placeholder="Pesquisar...">
-                                <div class="pqp-creatable-select-options"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gva-field">
-                        <label>Livro</label>
-                        <div class="pqp-creatable-select">
-                            <input type="hidden" name="livro">
-                            <button type="button" class="pqp-creatable-select-btn" data-target="ger_livro_dropdown">Digite ou selecione</button>
-                            <div id="ger_livro_dropdown" class="pqp-creatable-select-dropdown">
-                                <input type="text" class="pqp-creatable-select-search" placeholder="Pesquisar...">
-                                <div class="pqp-creatable-select-options"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gva-field">
-                        <label>Nacionalidade</label>
-                        <div class="pqp-singleselect">
-                            <input type="hidden" name="nacionalidade">
-                            <button type="button" class="pqp-singleselect-btn" data-target="ger_nacionalidade_dropdown">Todos</button>
-                            <div id="ger_nacionalidade_dropdown" class="pqp-singleselect-dropdown">
-                                <a href="#" data-value="">Todos</a>
-                                <?php foreach ($nacionalidades as $n) echo "<a href='#' data-value='" . esc_attr($n) . "'>" . esc_html($n) . "</a>"; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gva-field">
-                        <label>Tipo de Texto</label>
-                        <div class="pqp-singleselect">
-                            <input type="hidden" name="tipo_texto">
-                            <button type="button" class="pqp-singleselect-btn" data-target="ger_tipo_texto_dropdown">Todos</button>
-                            <div id="ger_tipo_texto_dropdown" class="pqp-singleselect-dropdown">
-                                <a href="#" data-value="">Todos</a>
-                                <?php foreach ($tipos_texto as $t) echo "<a href='#' data-value='" . esc_attr($t) . "'>" . esc_html($t) . "</a>"; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gva-field">
-                        <label>Forma</label>
-                        <div class="pqp-singleselect">
-                            <input type="hidden" name="forma_texto">
-                            <button type="button" class="pqp-singleselect-btn" data-target="ger_forma_dropdown">Todos</button>
-                            <div id="ger_forma_dropdown" class="pqp-singleselect-dropdown">
-                                <a href="#" data-value="">Todos</a>
-                                <?php foreach ($formas as $f) echo "<a href='#' data-value='" . esc_attr($f) . "'>" . esc_html($f) . "</a>"; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gva-field">
-                        <label>Período Literário</label>
-                        <div class="pqp-singleselect">
-                            <input type="hidden" name="periodo">
-                            <button type="button" class="pqp-singleselect-btn" data-target="ger_periodo_dropdown">Todos</button>
-                            <div id="ger_periodo_dropdown" class="pqp-singleselect-dropdown">
-                                <a href="#" data-value="">Todos</a>
-                                <?php foreach ($periodos as $p) echo "<a href='#' data-value='" . esc_attr($p) . "'>" . esc_html($p) . "</a>"; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gva-field">
-                        <label>Tipologia</label>
-                        <div class="pqp-singleselect">
-                            <input type="hidden" name="tipologia">
-                            <button type="button" class="pqp-singleselect-btn" data-target="ger_tipologia_dropdown">Todos</button>
-                            <div id="ger_tipologia_dropdown" class="pqp-singleselect-dropdown">
-                                <a href="#" data-value="">Todos</a>
-                                <?php foreach ($tipologias as $t) echo "<a href='#' data-value='" . esc_attr($t) . "'>" . esc_html($t) . "</a>"; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gva-field">
-                        <label>Gênero</label>
-                        <div class="pqp-singleselect">
-                            <input type="hidden" name="genero">
-                            <button type="button" class="pqp-singleselect-btn" data-target="ger_genero_dropdown">Todos</button>
-                            <div id="ger_genero_dropdown" class="pqp-singleselect-dropdown">
-                                <a href="#" data-value="">Todos</a>
-                                <?php foreach ($generos as $g) echo "<a href='#' data-value='" . esc_attr($g) . "'>" . esc_html($g) . "</a>"; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gva-field">
-                        <label>Subgênero</label>
-                        <div class="pqp-singleselect">
-                            <input type="hidden" name="subgenero">
-                            <button type="button" class="pqp-singleselect-btn" data-target="ger_subgenero_dropdown">Todos</button>
-                            <div id="ger_subgenero_dropdown" class="pqp-singleselect-dropdown">
-                                <a href="#" data-value="">Todos</a>
-                                <?php foreach ($subgeneros as $s) echo "<a href='#' data-value='" . esc_attr($s) . "'>" . esc_html($s) . "</a>"; ?>
-                            </div>
-                        </div>
-                    </div>
+                <div class="gva-toggle" style="margin: 20px 0; border-top: 1px solid #eee; padding-top: 15px;">
+                    <label style="font-weight:bold; font-size:14px; margin-right:10px;">Criar Texto Adicional?</label>
+                    <input type="radio" name="com_texto" value="1" id="txt_sim"> <label for="txt_sim" style="margin-right:15px;">Sim</label>
+                    <input type="radio" name="com_texto" value="0" id="txt_nao" checked> <label for="txt_nao">Não</label>
                 </div>
 
-                <div class="gva-upload-wrapper" style="margin-bottom: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-                    <label style="font-weight:bold; display:block; margin-bottom:10px;">Anexar Livro Base (PDF) - Opcional</label>
-                    <div style="display:flex; align-items: center; gap: 15px;">
-                        <button type="button" class="button button-secondary" id="upload_book_btn">
-                            <span class="dashicons dashicons-book"></span> Selecionar Livro
+                <div id="detalhes-texto-container" style="display:none;">
+                    <h3>Detalhes do Texto</h3> <div class="gva-grid">
+                        <div class="gva-field">
+                            <label>Título do Texto</label>
+                            <input type="text" name="titulo_texto" class="regular-text" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px;">
+                        </div>
+                         <div class="gva-field">
+                            <label>Autor</label>
+                            <div class="pqp-creatable-select">
+                                <input type="hidden" name="autor">
+                                <button type="button" class="pqp-creatable-select-btn" data-target="ger_autor_dropdown">Digite ou selecione</button>
+                                <div id="ger_autor_dropdown" class="pqp-creatable-select-dropdown">
+                                    <input type="text" class="pqp-creatable-select-search" placeholder="Pesquisar...">
+                                    <div class="pqp-creatable-select-options"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gva-field">
+                            <label>Livro</label>
+                            <div class="pqp-creatable-select">
+                                <input type="hidden" name="livro">
+                                <button type="button" class="pqp-creatable-select-btn" data-target="ger_livro_dropdown">Digite ou selecione</button>
+                                <div id="ger_livro_dropdown" class="pqp-creatable-select-dropdown">
+                                    <input type="text" class="pqp-creatable-select-search" placeholder="Pesquisar...">
+                                    <div class="pqp-creatable-select-options"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gva-field">
+                            <label>Nacionalidade</label>
+                            <div class="pqp-singleselect">
+                                <input type="hidden" name="nacionalidade">
+                                <button type="button" class="pqp-singleselect-btn" data-target="ger_nacionalidade_dropdown">Todos</button>
+                                <div id="ger_nacionalidade_dropdown" class="pqp-singleselect-dropdown">
+                                    <a href="#" data-value="">Todos</a>
+                                    <?php foreach ($nacionalidades as $n) echo "<a href='#' data-value='" . esc_attr($n) . "'>" . esc_html($n) . "</a>"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gva-field">
+                            <label>Tipo de Texto</label>
+                            <div class="pqp-singleselect">
+                                <input type="hidden" name="tipo_texto">
+                                <button type="button" class="pqp-singleselect-btn" data-target="ger_tipo_texto_dropdown">Todos</button>
+                                <div id="ger_tipo_texto_dropdown" class="pqp-singleselect-dropdown">
+                                    <a href="#" data-value="">Todos</a>
+                                    <?php foreach ($tipos_texto as $t) echo "<a href='#' data-value='" . esc_attr($t) . "'>" . esc_html($t) . "</a>"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gva-field">
+                            <label>Forma</label>
+                            <div class="pqp-singleselect">
+                                <input type="hidden" name="forma_texto">
+                                <button type="button" class="pqp-singleselect-btn" data-target="ger_forma_dropdown">Todos</button>
+                                <div id="ger_forma_dropdown" class="pqp-singleselect-dropdown">
+                                    <a href="#" data-value="">Todos</a>
+                                    <?php foreach ($formas as $f) echo "<a href='#' data-value='" . esc_attr($f) . "'>" . esc_html($f) . "</a>"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gva-field">
+                            <label>Período</label> <div class="pqp-singleselect">
+                                <input type="hidden" name="periodo">
+                                <button type="button" class="pqp-singleselect-btn" data-target="ger_periodo_dropdown">Todos</button>
+                                <div id="ger_periodo_dropdown" class="pqp-singleselect-dropdown">
+                                    <a href="#" data-value="">Todos</a>
+                                    <?php foreach ($periodos as $p) echo "<a href='#' data-value='" . esc_attr($p) . "'>" . esc_html($p) . "</a>"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gva-field">
+                            <label>Tipologia</label>
+                            <div class="pqp-singleselect">
+                                <input type="hidden" name="tipologia">
+                                <button type="button" class="pqp-singleselect-btn" data-target="ger_tipologia_dropdown">Todos</button>
+                                <div id="ger_tipologia_dropdown" class="pqp-singleselect-dropdown">
+                                    <a href="#" data-value="">Todos</a>
+                                    <?php foreach ($tipologias as $t) echo "<a href='#' data-value='" . esc_attr($t) . "'>" . esc_html($t) . "</a>"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gva-field">
+                            <label>Gênero</label>
+                            <div class="pqp-singleselect">
+                                <input type="hidden" name="genero" id="ger_genero">
+                                <button type="button" class="pqp-singleselect-btn" data-target="ger_genero_dropdown">Todos</button>
+                                <div id="ger_genero_dropdown" class="pqp-singleselect-dropdown">
+                                    <a href="#" data-value="">Todos</a>
+                                    <?php foreach ($generos as $g) echo "<a href='#' data-value='" . esc_attr($g) . "'>" . esc_html($g) . "</a>"; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gva-field">
+                            <label>Subgênero</label>
+                            <div class="pqp-singleselect">
+                                <input type="hidden" name="subgenero">
+                                <button type="button" class="pqp-singleselect-btn" id="ger_subgenero_btn" data-target="ger_subgenero_dropdown">Selecione o Gênero</button>
+                                <div id="ger_subgenero_dropdown" class="pqp-singleselect-dropdown">
+                                    <a href="#" data-value="">Todos</a>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gva-upload-wrapper" style="margin-bottom: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+                        <label style="font-weight:bold; display:block; margin-bottom:10px;">Selecionar Livro</label> <div style="display:flex; align-items: center; gap: 15px;">
+                            <span id="book_filename" style="color: #666; font-style: italic;">Nenhum arquivo selecionado</span>
+                            <input type="hidden" name="book_url" id="book_url">
+                        </div>
+                        <button type="button" class="button button-secondary" id="upload_book_btn" style="margin-top:10px;">
+                            <span class="dashicons dashicons-book"></span> Selecionar
                         </button>
-                        <span id="book_filename" style="color: #666; font-style: italic;">Nenhum arquivo selecionado</span>
-                        <input type="hidden" name="book_url" id="book_url">
                     </div>
                 </div>
 
-                <div class="gva-toggle">
-                    <label>Gerar com Imagem?</label>
-                    <input type="radio" name="com_imagem" value="1" id="img_sim"> <label for="img_sim">Sim</label>
+                <div class="gva-toggle" style="margin-top:20px;">
+                    <label style="font-weight:bold; display:block; margin-bottom:10px;">Gerar com Imagem?</label>
+                    <input type="radio" name="com_imagem" value="1" id="img_sim"> <label for="img_sim" style="margin-right:15px;">Sim</label>
                     <input type="radio" name="com_imagem" value="0" id="img_nao" checked> <label for="img_nao">Não</label>
                 </div>
 
@@ -339,7 +352,7 @@ $gemini_models = [
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <button type="submit" class="button button-primary button-hero">Gerar Questão</button>
+                    <button type="submit" class="button button-primary button-hero">Gerar</button>
                 </div>
             </form>
             <div id="result-gerar" class="gva-log"></div>
@@ -355,10 +368,12 @@ $gemini_models = [
 
         <div id="historico" class="gva-section">
             <h2>Histórico de Operações</h2>
-            <table class="wp-list-table widefat fixed striped">
-                <thead><tr><th>Data</th><th>Código</th><th>Tipo</th><th>Modelo IA</th><th>Imagem</th><th>Status</th></tr></thead>
-                <tbody id="tbody-historico"></tbody>
-            </table>
+            <div style="overflow-x:auto;">
+                <table class="wp-list-table widefat fixed striped">
+                    <thead><tr><th>Data</th><th>Código</th><th>Tipo</th><th>Modelo IA</th><th>Imagem</th><th>Status</th></tr></thead>
+                    <tbody id="tbody-historico"></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="config" class="gva-section">
