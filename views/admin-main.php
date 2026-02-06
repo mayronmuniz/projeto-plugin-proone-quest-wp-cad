@@ -361,17 +361,22 @@ $gemini_models = [
             </table>
         </div>
 
-         <div id="config" class="gva-section">
-            <form method="post" action="options.php">
-                <?php settings_fields('gva_options_group'); ?>
-                <?php do_settings_sections('gva_options_group'); ?>
+        <div id="config" class="gva-section">
+            <h2>Configurações do Plugin</h2>
+            <form id="form-config">
                 <table class="form-table">
                     <tr valign="top">
                         <th scope="row">Gemini API Key</th>
-                        <td><input type="password" name="gva_gemini_api_key" value="<?php echo esc_attr(get_option('gva_gemini_api_key')); ?>" class="regular-text"/></td>
+                        <td>
+                            <input type="password" name="gva_gemini_api_key" id="gva_gemini_api_key" value="<?php echo esc_attr(get_option('gva_gemini_api_key')); ?>" class="regular-text" style="width: 100%; max-width: 400px;"/>
+                            <p class="description">Insira sua chave da API Google Gemini AI Studio.</p>
+                        </td>
                     </tr>
                 </table>
-                <?php submit_button(); ?>
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="button button-primary">Salvar Configurações</button>
+                    <span id="config-feedback" style="margin-left: 10px; font-weight: bold;"></span>
+                </div>
             </form>
         </div>
 
