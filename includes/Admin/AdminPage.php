@@ -6,11 +6,12 @@ class AdminPage {
     public function run() {
         add_action('admin_menu', [$this, 'add_plugin_page']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
+        add_action('admin_init', [$this, 'register_settings']); // Registro adicionado
     }
 
     public function add_plugin_page() {
         add_menu_page(
-            'Gemini Vestibular AI',
+            'Register Manager AI Proone', // Título atualizado
             'Gemini AI',
             'manage_options',
             'gemini-vestibular-ai',
@@ -18,6 +19,10 @@ class AdminPage {
             'dashicons-superhero',
             60
         );
+    }
+
+    public function register_settings() {
+        register_setting('gva_options_group', 'gva_gemini_api_key');
     }
 
     public function enqueue_assets($hook) {
@@ -33,15 +38,10 @@ class AdminPage {
             'nonce'    => wp_create_nonce(GVA_NONCE)
         ]);
         
-        // Enqueue Media Uploader scripts
         wp_enqueue_media();
     }
 
     public function create_admin_page() {
-        // Fetch Subjects (Terms) to verify mapping
-        $subjects = get_terms(['taxonomy' => 'assunto', 'hide_empty' => false]); // Ajuste 'assunto' para sua taxonomia real
-        $institutions = get_terms(['taxonomy' => 'instituicao', 'hide_empty' => false]);
-        
         require_once GVA_PLUGIN_DIR . 'views/admin-main.php';
     }
 }
