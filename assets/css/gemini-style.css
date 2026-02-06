@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Reset básico para o escopo do plugin */
 .gva-wrapper {
     font-family: 'Inter', sans-serif;
     color: #1f2937;
@@ -8,299 +7,81 @@
     margin: 20px auto;
 }
 
-.gva-wrapper * {
-    box-sizing: border-box;
-}
-
-/* Header & Título */
-.gva-wrapper h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.gva-wrapper h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-top: 0;
-    margin-bottom: 1rem;
-    border-bottom: 2px solid #e5e7eb;
-    padding-bottom: 0.5rem;
-}
-
-.gva-wrapper h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #374151;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-}
-
-/* Tabs - Estilo ProOne */
-.gva-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    background: #000; /* Fundo preto conforme identidade */
-    padding: 1rem;
-    border-radius: 0.75rem; /* rounded-xl */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.gva-tab {
-    background-color: transparent;
-    color: #fff;
-    font-weight: 600; /* font-bold */
-    padding: 0.5rem 1rem; /* py-2 px-4 */
-    border-radius: 0.5rem; /* rounded-lg */
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.875rem;
-}
-
-.gva-tab:hover {
-    background-color: #0218fa; /* hover:bg-custom-blue */
-    color: white;
-}
-
-.gva-tab.active {
-    background-color: #fff;
-    color: #000;
-    border-color: #fff;
-}
-
-/* Conteúdo das Seções */
-.gva-section {
-    display: none;
-    background: #fff;
-    padding: 2rem; /* p-8 */
-    border-radius: 0.75rem; /* rounded-xl */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.gva-section.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Grid e Layout de Formulário */
-.gva-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.gva-field {
-    display: flex;
-    flex-direction: column;
-}
-
-.gva-field label {
-    font-size: 0.875rem; /* text-sm */
-    font-weight: 500; /* font-medium */
-    color: #374151;
-    margin-bottom: 0.25rem;
-}
-
-.gva-field input[type="text"],
-.gva-field input[type="number"],
-.gva-field select,
-.gva-field textarea {
+/* Custom Selects - Identidade ProOne */
+.pqp-singleselect, .pqp-creatable-select {
+    position: relative;
     width: 100%;
-    padding: 0.75rem; /* p-3 */
-    border: 2px solid #d1d5db; /* border-gray-300 */
-    border-radius: 0.5rem; /* rounded-lg */
-    font-size: 1rem;
-    transition: all 0.2s;
-    outline: none;
-    color: #000;
 }
 
-.gva-field input:focus,
-.gva-field select:focus,
-.gva-field textarea:focus {
-    border-color: #0218fa; /* focus:border-custom-blue */
-    box-shadow: 0 0 0 2px rgba(2, 24, 250, 0.2); /* focus:ring */
-}
-
-.full-width {
-    grid-column: 1 / -1;
-}
-
-/* Botões - Estilo ProOne */
-.gva-wrapper .button {
-    background-color: #000 !important; /* bg-black */
-    color: #fff !important;
-    font-weight: 700 !important; /* font-bold */
-    padding: 0.75rem 1.5rem !important; /* py-3 px-6 */
-    border-radius: 0.5rem !important; /* rounded-lg */
-    border: none !important;
+.pqp-singleselect-btn, .pqp-creatable-select-btn {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    text-align: left;
     cursor: pointer;
-    transition: background-color 0.2s !important;
-    text-transform: none;
-    height: auto !important;
-    line-height: normal !important;
-    font-size: 1rem !important;
-}
-
-.gva-wrapper .button:hover {
-    background-color: #0218fa !important; /* hover:bg-custom-blue */
-    transform: translateY(-1px);
-}
-
-.gva-wrapper .button:disabled {
-    background-color: #9ca3af !important;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Botão pequeno (salvar estilo) */
-.gva-wrapper .button-small {
-    padding: 0.25rem 0.75rem !important;
-    font-size: 0.75rem !important;
-    margin-top: 0.5rem;
-    border-radius: 9999px !important; /* rounded-full */
-}
-
-/* Upload Area */
-.gva-upload-area {
-    background-color: #f9fafb; /* bg-gray-50 */
-    border: 2px dashed #d1d5db;
-    padding: 2rem;
-    text-align: center;
-    border-radius: 0.75rem;
-    margin-bottom: 2rem;
-    transition: border-color 0.2s;
-}
-
-.gva-upload-area:hover {
-    border-color: #0218fa;
-    background-color: #f3f4f6;
-}
-
-.gva-upload-area span {
-    display: block;
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-/* Toggle Switch e Radios */
-.gva-toggle {
-    margin-bottom: 1.5rem;
+    color: #374151;
+    font-size: 14px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 1rem;
 }
 
-.gva-toggle label {
-    font-weight: 600;
+.pqp-singleselect-btn:after, .pqp-creatable-select-btn:after {
+    content: '▼';
+    font-size: 10px;
+    color: #9ca3af;
 }
 
-.gva-toggle input[type="radio"] {
-    accent-color: #0218fa;
-    width: 1.25rem;
-    height: 1.25rem;
-    cursor: pointer;
-}
-
-/* Área de Ações (Rodapé do form) */
-.gva-actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e5e7eb;
-}
-
-.gva-actions select {
-    width: auto;
-    min-width: 200px;
-}
-
-/* Logs e Resultados */
-.gva-log {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    max-height: 400px;
+.pqp-singleselect-dropdown, .pqp-creatable-select-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 250px;
     overflow-y: auto;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    z-index: 50;
+    margin-top: 4px;
 }
 
-.gva-loader {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #0218fa;
-    font-weight: 600;
+.pqp-singleselect-dropdown a, .pqp-creatable-select-options a {
+    display: block;
+    padding: 10px 15px;
+    color: #374151;
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 1px solid #f3f4f6;
 }
 
-.success-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.success-list li {
-    background-color: #dcfce7; /* green-100 */
-    color: #166534; /* green-800 */
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    margin-bottom: 0.5rem;
-    border-left: 4px solid #22c55e;
-}
-
-.gva-log .error {
-    background-color: #fee2e2; /* red-100 */
-    color: #991b1b; /* red-800 */
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border-left: 4px solid #ef4444;
-}
-
-/* Tabelas (WP List Table overrides para combinar) */
-.gva-wrapper .wp-list-table {
-    border: none;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.gva-wrapper .wp-list-table thead th {
-    background-color: #000;
-    color: #fff;
-    font-weight: 600;
-    border: none;
-}
-
-.gva-wrapper .wp-list-table thead th a {
-    color: #fff;
-}
-
-.gva-wrapper .wp-list-table tbody td {
-    padding: 12px 10px;
-    vertical-align: middle;
-}
-
-.gva-wrapper .wp-list-table tr:nth-child(even) {
-    background-color: #f9fafb;
-}
-
-.gva-wrapper .wp-list-table tr:hover {
+.pqp-singleselect-dropdown a:hover, .pqp-creatable-select-options a:hover {
     background-color: #f3f4f6;
+    color: #0218fa;
 }
+
+.pqp-creatable-select-search {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 1px solid #d1d5db;
+    outline: none;
+    font-size: 14px;
+}
+
+/* Resto do estilo mantido (Grid, Tabs, Buttons) */
+.gva-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+.gva-field { display: flex; flex-direction: column; }
+.gva-field label { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem; }
+.full-width { grid-column: 1 / -1; }
+.button-hero { padding: 10px 20px !important; font-size: 16px !important; }
+.gva-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #000; padding: 10px; border-radius: 8px; }
+.gva-tab { background: transparent; color: #fff; border: none; padding: 8px 16px; cursor: pointer; border-radius: 4px; font-weight: 600;}
+.gva-tab.active { background: #fff; color: #000; }
+.gva-section { display: none; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.gva-section.active { display: block; }
+.gva-log { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 5px; }
