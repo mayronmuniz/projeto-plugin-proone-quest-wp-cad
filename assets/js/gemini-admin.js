@@ -12,6 +12,15 @@ jQuery(document).ready(function($) {
         if($(this).data('target') === '#novos-assuntos') loadNewSubjects();
     });
 
+    // --- Toggle Texto Adicional (Solicitação 14) ---
+    $('input[name="com_texto"]').change(function() {
+        if($(this).val() === '1') {
+            $('#detalhes-texto-container').slideDown();
+        } else {
+            $('#detalhes-texto-container').slideUp();
+        }
+    });
+
     // --- Lógica de Dropdowns ---
     $(document).on('click', '.pqp-singleselect-btn, .pqp-creatable-select-btn', function(e) {
         e.stopPropagation();
@@ -48,14 +57,13 @@ jQuery(document).ready(function($) {
         var container = $(this).closest('.pqp-creatable-select');
         var optionsDiv = $(this).siblings('.pqp-creatable-select-options');
         
-        // Filtragem visual simples
         optionsDiv.find('a').each(function() {
             var text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(term) > -1);
         });
 
         if(e.key === 'Enter' && term.length > 0) {
-            container.find('input[type="hidden"]').val(term);
+            container.find('input[type="hidden"]').val(term).trigger('change'); // Trigger change
             container.find('.pqp-creatable-select-btn').text(term);
             $(this).closest('.pqp-creatable-select-dropdown').hide();
         }
@@ -65,7 +73,7 @@ jQuery(document).ready(function($) {
         e.preventDefault();
         var value = $(this).data('value');
         var container = $(this).closest('.pqp-creatable-select');
-        container.find('input[type="hidden"]').val(value);
+        container.find('input[type="hidden"]').val(value).trigger('change'); // Trigger change
         container.find('.pqp-creatable-select-btn').text(value);
         $(this).closest('.pqp-creatable-select-dropdown').hide();
     });
@@ -81,7 +89,7 @@ jQuery(document).ready(function($) {
                 response.data.forEach(function(item) {
                     html += '<a href="#" data-value="' + item.name + '">' + item.name + '</a>';
                 });
-                $('#' + targetId + ' .pqp-creatable-select-options').html(html);
+                $('#' + targetId + ' .pqp-creatable-select-options, #' + targetId + '.pqp-singleselect-dropdown').html(html); // Suporte a ambos
             }
         });
     }
@@ -89,12 +97,10 @@ jQuery(document).ready(function($) {
     // Carregar iniciais
     populateDropdown('gva_get_institutions', 'cad_inst_dropdown');
     populateDropdown('gva_get_years', 'cad_ano_dropdown');
-    populateDropdown('gva_get_versions', 'cad_versao_dropdown');
     
     // Gerar
     populateDropdown('gva_get_institutions', 'ger_inst_dropdown');
     populateDropdown('gva_get_years', 'ger_ano_dropdown');
-    populateDropdown('gva_get_versions', 'ger_versao_dropdown');
     populateDropdown('gva_get_authors', 'ger_autor_dropdown');
     populateDropdown('gva_get_books', 'ger_livro_dropdown');
 
@@ -104,6 +110,25 @@ jQuery(document).ready(function($) {
         var prefix = $(this).attr('id').split('_')[0]; // cad ou ger
         if(disc) {
             populateDropdown('gva_get_subjects', prefix + '_assunto_dropdown', { discipline: disc });
+        }
+    });
+
+    // Dependência Instituição -> Versão (Solicitação 04 e 05)
+    $('#cad_instituicao, #ger_instituicao').on('change', function() {
+        var inst = $(this).val();
+        var prefix = $(this).attr('id').split('_')[0];
+        if(inst) {
+             $('#' + prefix + '_versao_btn').text('Selecione...');
+             populateDropdown('gva_get_versions_by_inst', prefix + '_versao_dropdown', { institution: inst });
+        }
+    });
+
+    // Dependência Gênero -> Subgênero (Solicitação 05 Gerar)
+    $('#ger_genero').change(function() {
+        var genre = $(this).val();
+        if(genre) {
+            $('#ger_subgenero_btn').text('Selecione...');
+            populateDropdown('gva_get_subgenres_by_genre', 'ger_subgenero_dropdown', { genre: genre });
         }
     });
 
@@ -200,11 +225,13 @@ jQuery(document).ready(function($) {
                 disciplina: form.find('input[name="disciplina"]').val(),
                 assunto: form.find('input[name="assunto"]').val(),
                 instituicao: form.find('input[name="instituicao"]').val(),
+                estilo_questao: form.find('input[name="estilo_questao"]').val(), // Novo campo
                 ano: form.find('input[name="ano"]').val(),
                 versao: form.find('input[name="versao"]').val(),
                 nivel_dificuldade: form.find('input[name="nivel_dificuldade"]').val(),
+                com_texto: form.find('input[name="com_texto"]:checked').val(), // Verifica se deve criar texto
                 
-                // Detalhes de Texto
+                // Detalhes de Texto (serão ignorados no PHP se com_texto for 0)
                 titulo_texto: form.find('input[name="titulo_texto"]').val(),
                 tipo_texto: form.find('input[name="tipo_texto"]').val(),
                 genero: form.find('input[name="genero"]').val(),
@@ -227,10 +254,11 @@ jQuery(document).ready(function($) {
         log.html('<div class="gva-loader">Criando questões inéditas...</div>');
 
         $.post(gva_vars.ajax_url, data, function(response) {
-            btn.prop('disabled', false).text('Gerar Questão');
+            btn.prop('disabled', false).text('Gerar');
             if(response.success) {
                 var html = '<ul class="success-list">';
                 response.data.forEach(function(q) {
+                    // Correção ID e Código
                     html += '<li>Questão Inédita <strong>' + q.code + '</strong> gerada! (ID: ' + q.id + ')</li>';
                 });
                 html += '</ul>';
@@ -240,7 +268,7 @@ jQuery(document).ready(function($) {
                 log.html('<div class="error">' + (response.data || 'Erro desconhecido') + '</div>');
             }
         }).fail(function() {
-             btn.prop('disabled', false).text('Gerar Questão');
+             btn.prop('disabled', false).text('Gerar');
              log.html('<div class="error">Erro de conexão.</div>');
         });
     });
