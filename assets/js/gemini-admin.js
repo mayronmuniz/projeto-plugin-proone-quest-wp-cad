@@ -245,6 +245,35 @@ jQuery(document).ready(function($) {
         });
     });
 
+    // --- Salvar Configurações (AJAX) ---
+    $('#form-config').submit(function(e) {
+        e.preventDefault();
+        var btn = $(this).find('button[type="submit"]');
+        var feedback = $('#config-feedback');
+        var apiKey = $('#gva_gemini_api_key').val();
+
+        btn.prop('disabled', true).text('Salvando...');
+        feedback.text('').removeClass('success error');
+
+        $.post(gva_vars.ajax_url, {
+            action: 'gva_save_settings',
+            nonce: gva_vars.nonce,
+            api_key: apiKey
+        }, function(response) {
+            btn.prop('disabled', false).text('Salvar Configurações');
+            
+            if(response.success) {
+                feedback.text(response.data).css('color', 'green');
+                setTimeout(function() { feedback.text(''); }, 3000);
+            } else {
+                feedback.text('Erro: ' + response.data).css('color', 'red');
+            }
+        }).fail(function() {
+            btn.prop('disabled', false).text('Salvar Configurações');
+            feedback.text('Erro de conexão.').css('color', 'red');
+        });
+    });
+
     function loadHistory() {
         $.get(gva_vars.ajax_url, { action: 'gva_get_history', nonce: gva_vars.nonce }, function(res) {
             if(res.success) {
