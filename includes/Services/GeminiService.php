@@ -9,25 +9,43 @@ class GeminiService {
         $this->api_key = get_option('gva_gemini_api_key');
     }
 
-    public function generate_content($model, $prompt, $system_instruction, $pdf_url = null) {
+    public function generate_content($model, $prompt, $system_instruction, $file_url = null) {
         if (empty($this->api_key)) {
             return new \WP_Error('no_api_key', 'Chave API do Gemini não configurada.');
         }
 
         $url = $this->api_url_base . $model . ':generateContent?key=' . $this->api_key;
 
-        $parts = [['text' => $prompt]];
-
-        // Handle PDF (Multimodal) - Using File API logic abstraction for simplicity
-        // In a real scenario, we'd upload the file to Google AI Studio File API first, get URI, then pass here.
-        // For this implementation, we assume text extraction OR small base64 provided in prompt context.
-        // Se o usuário anexou PDF, o ideal é extrair o texto em PHP antes de enviar, pois a API direta de arquivos é complexa.
+        $user_parts = [];
         
+        // Processar Arquivo (PDF)
+        if ($file_url) {
+            // Converter URL para caminho local se for do mesmo domínio
+            $upload_dir = wp_upload_dir();
+            if (strpos($file_url, $upload_dir['baseurl']) !== false) {
+                $file_path = str_replace($upload_dir['baseurl'], $upload_dir['basedir'], $file_url);
+                if (file_exists($file_path)) {
+                    $file_data = base64_encode(file_get_contents($file_path));
+                    $mime_type = mime_content_type($file_path);
+                    
+                    $user_parts[] = [
+                        'inline_data' => [
+                            'mime_type' => $mime_type,
+                            'data' => $file_data
+                        ]
+                    ];
+                }
+            }
+        }
+
+        // Adicionar Prompt de Texto
+        $user_parts[] = ['text' => $prompt];
+
         $body = [
             'contents' => [
                 [
                     'role' => 'user',
-                    'parts' => $parts
+                    'parts' => $user_parts
                 ]
             ],
             'systemInstruction' => [
@@ -35,14 +53,14 @@ class GeminiService {
             ],
             'generationConfig' => [
                 'responseMimeType' => 'application/json',
-                'temperature' => 0.7
+                'temperature' => 0.4 // Temperatura ajustada para precisão
             ]
         ];
 
         $args = [
             'body'        => json_encode($body),
             'headers'     => ['Content-Type' => 'application/json'],
-            'timeout'     => 120, // Long timeout for batch generation
+            'timeout'     => 120,
             'method'      => 'POST',
             'data_format' => 'body',
         ];
@@ -60,11 +78,8 @@ class GeminiService {
             return new \WP_Error('api_error', $data['error']['message']);
         }
 
-        // Extract JSON from the text response
         $raw_text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
-        
-        // Clean markdown code blocks if present
-        $raw_text = preg_replace('/^```json\s*|\s*```$/', '', $raw_text);
+        $raw_text = preg_replace('/^```json\s*|\s*```$/', '', $raw_text); // Limpeza Markdown
         
         return json_decode($raw_text, true);
     }
