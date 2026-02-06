@@ -3,7 +3,7 @@
  * Plugin Name: Plataforma de Questões ProOne - Register-Manager
  * Plugin URI: https://proone.io
  * Description: Cadastramento e Geração de Questões de Vestibular usando Google Gemini. Suporte a PDF, AVIF e Taxonomias Dinâmicas.
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: mayronmuniz.dev
  * Author URI: https://proone.io
  * Text Domain: gemini-vestibular-ai
