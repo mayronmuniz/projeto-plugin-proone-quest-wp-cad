@@ -73,15 +73,35 @@
     font-size: 14px;
 }
 
-/* Resto do estilo mantido (Grid, Tabs, Buttons) */
+/* Grid e Layout */
 .gva-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
 .gva-field { display: flex; flex-direction: column; }
 .gva-field label { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem; }
 .full-width { grid-column: 1 / -1; }
-.button-hero { padding: 10px 20px !important; font-size: 16px !important; }
+
+/* Botões */
+.button-hero { 
+    padding: 10px 20px !important; 
+    font-size: 16px !important; 
+    background-color: #000 !important; 
+    color: #fff !important; 
+    border: none !important;
+    transition: background 0.3s ease;
+}
+.button-hero:hover {
+    background-color: #0218fa !important;
+    color: #fff !important;
+}
+
+.gva-actions { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
+
+/* Tabs */
 .gva-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #000; padding: 10px; border-radius: 8px; }
 .gva-tab { background: transparent; color: #fff; border: none; padding: 8px 16px; cursor: pointer; border-radius: 4px; font-weight: 600;}
 .gva-tab.active { background: #fff; color: #000; }
 .gva-section { display: none; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .gva-section.active { display: block; }
 .gva-log { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 5px; }
+
+/* Upload */
+.gva-upload-wrapper button { margin-right: 10px; }
