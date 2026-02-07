@@ -1,5 +1,5 @@
 <?php
-namespace GeminiVestibularAI\Frontend;
+namespace ProOneAI\Frontend;
 
 class Shortcode {
 
@@ -9,9 +9,8 @@ class Shortcode {
 
     public function render_shortcode($atts) {
         // Segurança: Verificar permissões. 
-        // Como o AjaxHandler verifica 'manage_options', o formulário só deve ser exibido para quem tem essa permissão.
         if (!current_user_can('manage_options')) {
-            return '<p class="gva-error">Acesso negado: Você não tem permissão para acessar esta ferramenta de cadastro.</p>';
+            return '<p class="p1ai-error">Acesso negado: Você não tem permissão para acessar esta ferramenta de cadastro.</p>';
         }
 
         // Carregar Assets necessários apenas quando o shortcode é usado
@@ -21,26 +20,25 @@ class Shortcode {
         ob_start();
         
         // Inclui a mesma view do admin para consistência
-        // Nota: A view admin-main.php usa classes do WP Admin (.wrap), pode precisar de ajustes CSS no frontend dependendo do tema.
-        require GVA_PLUGIN_DIR . 'views/admin-main.php';
+        require P1AI_PLUGIN_DIR . 'views/admin-main.php';
         
         return ob_get_clean();
     }
 
     private function enqueue_assets() {
         // Carrega o CSS
-        wp_enqueue_style('gva-style', GVA_PLUGIN_URL . 'assets/css/gemini-style.css', [], GVA_VERSION);
+        wp_enqueue_style('p1ai-style', P1AI_PLUGIN_URL . 'assets/css/proone-style.css', [], P1AI_VERSION);
         
-        // Carrega o JS (jQuery como dependência)
-        wp_enqueue_script('gva-script', GVA_PLUGIN_URL . 'assets/js/gemini-admin.js', ['jquery'], GVA_VERSION, true);
+        // Carrega o JS
+        wp_enqueue_script('p1ai-script', P1AI_PLUGIN_URL . 'assets/js/proone-admin.js', ['jquery'], P1AI_VERSION, true);
         
-        // Passa as variáveis PHP para o JS (Nonce e URL Ajax)
-        wp_localize_script('gva-script', 'gva_vars', [
+        // Passa as variáveis PHP para o JS
+        wp_localize_script('p1ai-script', 'p1ai_vars', [
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce'    => wp_create_nonce(GVA_NONCE)
+            'nonce'    => wp_create_nonce(P1AI_NONCE)
         ]);
         
-        // Importante: Carrega scripts de mídia do WordPress para o upload de PDF funcionar no Frontend
+        // Carrega scripts de mídia do WordPress para o upload de PDF
         if (!did_action('wp_enqueue_media')) {
             wp_enqueue_media();
         }
